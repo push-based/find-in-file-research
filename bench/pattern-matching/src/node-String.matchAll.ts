@@ -1,6 +1,6 @@
-import {type LineHit} from "../../../src/lib/types.ts";
+import {type LinePosition} from "../../../src/lib/types.ts";
 
-export default function getLineHits(content: string, pattern: RegExp): LineHit[] {
+export default function getLineHits(content: string, pattern: RegExp): LinePosition[] {
     return [...content.matchAll(pattern)].map(
         ({index = 0, 0: match = ''}) => ({
             startColumn: index,

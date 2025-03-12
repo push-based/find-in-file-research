@@ -5,8 +5,10 @@
   "description": "Benchmark for find-in-file",
   "type": "module",
   "scripts": {
-    "bench:file-access": "node --expose-gc --experimental-strip-types ./bench/file-access/index.ts",
-    "bench:content-matching": "node --expose-gc --experimental-strip-types ./bench/content-matching/index.ts",
+    "bench:pattern-matching": "node --expose-gc --experimental-strip-types ./bench/pattern-matching/index.ts",
+    "bench:access-line-sync": "node --expose-gc --experimental-strip-types ./bench/access-line-sync/index.ts",
+    "bench:access-line-sync-bail": "node --expose-gc --experimental-strip-types ./bench/access-line-sync-bail/index.ts",
+    "bench:access-file": "node --expose-gc --experimental-strip-types ./bench/access-file/index.ts",
     "bench:find-files": "node --expose-gc --experimental-strip-types ./bench/find-files/index.ts",
     "bench:find-in-file": "node --expose-gc --experimental-strip-types ./bench/find-in-file/index.ts",
     "bench:find-in-file-bail": "node --expose-gc --experimental-strip-types ./bench/find-in-file-bail/index.ts",

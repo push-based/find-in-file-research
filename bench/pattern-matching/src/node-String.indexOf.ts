@@ -1,6 +1,6 @@
-import {type LineHit} from "../../../src/lib/types.ts";
+import {type LinePosition} from "../../../src/lib/types.ts";
 
-export default function getLineHits(content: string, pattern: string): LineHit[] {
+export default function getLineHits(content: string, pattern: string): LinePosition[] {
     const hits = [];
     let index = content.indexOf(pattern);
 

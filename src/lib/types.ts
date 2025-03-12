@@ -1,16 +1,16 @@
-export type Pattern = `${number}%` | `start-${number}`| `mid-{number}`| `end-{number}`;
+export type Pattern = `${number}%` | `start-${number}` | `mid-{number}` | `end-{number}`;
 
-export type LineHit = {
+export type LinePosition = {
     startColumn: number;
-    endColumn: number;
+    endColumn?: number;
 };
 
-export type FileHit = {
+export type SourcePosition = {
+    startLine: number;
+    endLine?: number;
+} & LinePosition;
+
+export type SourceLocation = {
     file: string,
-    position: {
-        startLine: number;
-        startColumn?: number;
-        endLine?: number;
-        endColumn?: number;
-    }
+    position: SourcePosition
 };

@@ -3,6 +3,7 @@ import * as fsSync from "node:fs";
 import * as path from "node:path";
 import {ensureDirectoryExists, removeDirectoryIfExists} from "./file-system.ts";
 import {LOC_RANGES} from "./constants.ts";
+import type {ctx, trial} from "mitata";
 const CONCURRENCY_LIMIT = 5;
 
 export function fileName(baseDir: string, loc: number): string {
@@ -96,4 +97,9 @@ export async function generateTestFiles(baseDir: string, {
     }
 
     await processDirsSequentially(baseDir, 1);
+}
+
+export async function runAndSave(filePath: string, run: () => Promise<{ context: ctx, benchmarks: trial[] }>) {
+    const {benchmarks}: { context: ctx, benchmarks: trial[] } = await run();
+    await fs.writeFile(filePath, JSON.stringify(benchmarks, null, 2));
 }

@@ -1,4 +1,4 @@
-import type {FileHit} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/types.ts";
 import {readFile} from "node:fs/promises";
 import getLineHits from "./get-hits.ts";
 
@@ -6,8 +6,8 @@ export default async function findInFile(
     file: string,
     searchPattern: RegExp,
     bail = false,
-): Promise<FileHit[]> {
-    const hits: FileHit[] = [];
+): Promise<SourceLocation[]> {
+    const hits: SourceLocation[] = [];
     const content = await readFile(file, 'utf8');
     const lines = content.split('\n');
 

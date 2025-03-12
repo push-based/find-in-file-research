@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import findInFileSync from '../find-in-file/src/find-in-file.sync.ts';
 import findInFileAsync from '../find-in-file/src/find-in-file.async.ts';
 import findInFileStream from '../find-in-file/src/find-in-file.stream.ts';
-import {fileName} from "../../src/lib/utils.ts";
+import {fileName, runAndSave} from "../../src/lib/utils.ts";
 import {LOC_RANGES, VOLUME_TEST_DIR} from "../../src/lib/constants.ts";
 
 const fixtureDir = path.join(process.cwd(), 'tmp', VOLUME_TEST_DIR);
@@ -43,6 +43,8 @@ LOC_RANGES.forEach((loc) => {
     });
 });
 
-await run({
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+await runAndSave(path.join(process.cwd(), '.bench', `${__dirname}-report.json`), () => run({
     throw: true,
-});
+    format: 'json',
+}));

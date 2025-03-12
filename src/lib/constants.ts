@@ -1,7 +1,8 @@
 export const LOC_RANGES = [
-  10, 100,
-  1000, 10_000,
-  100_000
+  10, //100,
+ // 1000,
+ // 10_000,
+  //100_000
 ];
 
 export const VOLUME_TEST_DIR = 'loc-files';

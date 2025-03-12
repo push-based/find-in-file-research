@@ -1,14 +1,14 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import findInFile from "../../find-in-file/src/find-in-file.sync.ts";
-import type {FileHit} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/types.ts";
 
 export default async function findFiles(
     baseDir: string,
     glob: RegExp,
     pattern: RegExp
-): Promise<FileHit[]> {
-    const results: FileHit[] = [];
+): Promise<SourceLocation[]> {
+    const results: SourceLocation[] = [];
     const queue: string[] = [baseDir];
 
     while (queue.length > 0) {

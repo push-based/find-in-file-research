@@ -1,4 +1,4 @@
-import type {FileHit} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/types.ts";
 import {createReadStream} from "node:fs";
 import {createInterface} from "node:readline";
 import getLineHits from "./get-hits.ts";
@@ -7,8 +7,8 @@ export default async function findInFile(
     file: string,
     searchPattern: RegExp,
     bail = true
-): Promise<FileHit[]> {
-    const hits: FileHit[] = [];
+): Promise<SourceLocation[]> {
+    const hits: SourceLocation[] = [];
 
     return new Promise((resolve, reject) => {
         const stream = createReadStream(file, {encoding: 'utf8'});

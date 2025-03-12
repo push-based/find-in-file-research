@@ -1,4 +1,4 @@
-import type {FileHit} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/types.ts";
 import {readFileSync} from "node:fs";
 import getLineHits from "./get-hits.ts";
 
@@ -6,8 +6,8 @@ export default function findInFile(
     file: string,
     searchPattern: RegExp,
     bail = false,
-): FileHit[] {
-    const hits: FileHit[] = [];
+): SourceLocation[] {
+    const hits: SourceLocation[] = [];
     const content = readFileSync(file, 'utf8');
     const lines = content.split('\n');
 

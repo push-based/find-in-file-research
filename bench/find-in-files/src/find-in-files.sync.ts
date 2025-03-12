@@ -1,15 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import findInFile from "../../find-in-file/src/find-in-file.sync.ts";
-import type {FileHit} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/types.ts";
 
 export default function findInFiles(
     baseDir: string,
     glob: RegExp,
     pattern: RegExp,
-): FileHit[] {
+): SourceLocation[] {
     const queue: string[] = [baseDir];
-    const results: FileHit[] = [];
+    const results: SourceLocation[] = [];
 
     while (queue.length > 0) {
         const dir = queue.shift()!;
