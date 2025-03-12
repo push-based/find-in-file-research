@@ -1,0 +1,26 @@
+{
+  "name": "@push-based/find-in-files-benchmark",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "Benchmark for find-in-file",
+  "type": "module",
+  "scripts": {
+    "bench:file-access": "node --expose-gc --experimental-strip-types ./bench/file-access/index.ts",
+    "bench:content-matching": "node --expose-gc --experimental-strip-types ./bench/content-matching/index.ts",
+    "bench:find-files": "node --expose-gc --experimental-strip-types ./bench/find-files/index.ts",
+    "bench:find-in-file": "node --expose-gc --experimental-strip-types ./bench/find-in-file/index.ts",
+    "bench:find-in-file-bail": "node --expose-gc --experimental-strip-types ./bench/find-in-file-bail/index.ts",
+    "bench:find-in-files": "node --expose-gc --experimental-strip-types ./bench/find-in-files/index.ts",
+    "setup": "npx tsx ./src/setup-fixtures.bin.ts"
+  },
+  "engines": {
+    "node": ">=23.9.0"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "mitata": "^1.0.34",
+    "prettier": "^3.4.1",
+    "tsx": "^4.19.0"
+  }
+}
