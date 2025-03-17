@@ -2,37 +2,41 @@ import {bench, compact, group, run, summary} from 'mitata';
 import * as path from 'node:path';
 import findInFilesSync from './src/find-in-files.sync.ts';
 import findInFilesAsync from './src/find-in-files.async.ts';
+import fastFindInFiles from './src/fast-find-in-files.ts';
 import {countFiles} from "../../src/lib/file-system.ts";
-import {NESTED_10_TEST_DIR} from "../../src/lib/constants.ts";
-import {runAndSave} from "../../src/lib/utils.ts";
+import {DIR_3_FILE_10_NEST_10} from "../../src/lib/constants.ts";
+import {runWithConfig} from "../../src/lib/utils.ts";
 
-const fixtureDir = path.join(process.cwd(), 'tmp', NESTED_10_TEST_DIR);
+const fixtureDir = path.join(process.cwd(), 'tmp', DIR_3_FILE_10_NEST_10);
 const count = countFiles(fixtureDir);
 
-const glob = /.txt/g;
+const glob = /.txt$/g;
 
 summary(() => {
- // compact(() => {
+     compact(() => {
     group(`find in files; count: ${count}; glob: ${glob}`, () => {
-      bench('sync', () => {
-        if (findInFilesSync(fixtureDir, glob, /10%/g).length === 0) {
-          throw new Error('No hits found. Bench invalid.');
-        }
-      }).gc('inner');
+        bench('sync', async () => {
+            if ((await findInFilesSync(fixtureDir, glob, '10%')).length !== 0) {
+                throw new Error('No hits found. Bench invalid.');
+            }
+        }).gc('inner');
 
-      bench('async', async () => {
-        if ((await findInFilesAsync(fixtureDir, glob, /10%/g)).length === 0) {
-          throw new Error('No hits found. Bench invalid.');
-        }
-      }).gc('inner');
+        bench('async', async () => {
+            if ((await findInFilesAsync(fixtureDir, glob, '10%')).length === 0) {
+                throw new Error('No hits found. Bench invalid.');
+            }
+        }).gc('inner');
 
- //   })
-  })
+
+        bench('fastFindInFiles', async () => {
+            if ((await fastFindInFiles(fixtureDir, '10%')).length === 0) {
+                throw new Error('No hits found. Bench invalid.');
+            }
+        }).gc('inner');
+
+           })
+    })
 })
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-await runAndSave(path.join(process.cwd(), '.bench', `${__dirname}-report.json`), () => run({
-  throw: true,
-  format: 'json',
-}));
+await runWithConfig(run)
 

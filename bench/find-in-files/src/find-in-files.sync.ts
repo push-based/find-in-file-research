@@ -1,13 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import findInFile from "../../find-in-file/src/find-in-file.sync.ts";
-import type {SourceLocation} from "../../../src/lib/types.ts";
+import type {SourceLocation} from "../../../src/lib/shared/types.ts";
 
-export default function findInFiles(
+export default async function findInFiles(
     baseDir: string,
     glob: RegExp,
-    pattern: RegExp,
-): SourceLocation[] {
+    pattern: string,
+    bail = false
+): Promise<SourceLocation[]> {
     const queue: string[] = [baseDir];
     const results: SourceLocation[] = [];
 
@@ -26,8 +27,12 @@ export default function findInFiles(
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 queue.push(fullPath);
-            } else if (entry.isFile() && fullPath.match(glob)) {
-                results.push(...findInFile(fullPath, pattern));
+            } else if (entry.isFile()
+            //    && fullPath.match(glob)
+            ) {
+                for (const result of await findInFile(fullPath, pattern, bail)) {
+                    results.push(result);
+                }
             }
         }
     }

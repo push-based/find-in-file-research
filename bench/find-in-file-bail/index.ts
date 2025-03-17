@@ -3,48 +3,46 @@ import * as path from 'node:path';
 import findInFileSync from '../find-in-file/src/find-in-file.sync.ts';
 import findInFileAsync from '../find-in-file/src/find-in-file.async.ts';
 import findInFileStream from '../find-in-file/src/find-in-file.stream.ts';
-import {fileName, runAndSave} from "../../src/lib/utils.ts";
+import {fileName, runWithConfig} from "../../src/lib/utils.ts";
 import {LOC_RANGES, VOLUME_TEST_DIR} from "../../src/lib/constants.ts";
 
 const fixtureDir = path.join(process.cwd(), 'tmp', VOLUME_TEST_DIR);
 const bail = true;
 const patterns = [
-    /10%/g,
-    /30%/g,
-    /60%/g,
+    '10%',
+    '30%',
+    '60%',
 ];
 
 LOC_RANGES.forEach((loc) => {
     patterns.forEach((regex) => {
+
         const targetFile = fileName(fixtureDir, loc);
 
         summary(() => {
             compact(() => {
-                group(`find in file bail; loc: ${loc}; pattern: ${regex}`, () => {
-                    bench('sync', () => {
-                        if(findInFileSync(targetFile, regex, bail).length === 0) {
+                group(`find in file; loc: ${loc}; regex: ${regex}`, () => {
+                    bench('sync', async () => {
+                        if ((await findInFileSync(targetFile, regex, bail)).length === 0) {
                             throw new Error('No hits found. Bench invalid.')
                         }
                     }).gc('inner');
                     bench('async', async () => {
-                        if((await findInFileAsync(targetFile, regex, bail)).length === 0) {
+                        if ((await findInFileAsync(targetFile, regex, bail)).length === 0) {
                             throw new Error('No hits found. Bench invalid.')
                         }
                     }).gc('inner');
                     bench('stream', async () => {
-                        if((await findInFileStream(targetFile, regex, bail)).length === 0) {
+                        if ((await findInFileStream(targetFile, regex, bail)).length === 0) {
                             throw new Error('No hits found. Bench invalid.')
                         }
                     }).gc('inner');
                 })
+
             })
         })
+    })
 
-    });
 });
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-await runAndSave(path.join(process.cwd(), '.bench', `${__dirname}-report.json`), () => run({
-    throw: true,
-    format: 'json',
-}));
+await runWithConfig(run)

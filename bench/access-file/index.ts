@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import {bench, compact, do_not_optimize, group, run, summary} from 'mitata';
-import {fileName, runAndSave} from "../../src/lib/utils.ts";
+import {fileName, runWithConfig} from "../../src/lib/utils.ts";
 import {LOC_RANGES, VOLUME_TEST_DIR} from "../../src/lib/constants.ts";
 import readFileSync from "./src/node-fs.readFileSync.ts";
 import readFilePromise from "./src/node-fs.promise.readFile.ts";
@@ -17,17 +17,13 @@ LOC_RANGES.forEach((loc) => {
                     {
                         name: 'node:fs.readFileSync',
                         fn: () => {
-                            for (const line of readFileSync(targetFile)) {
-                                do_not_optimize(line);
-                            }
+                                do_not_optimize(readFileSync(targetFile));
                         }
                     },
                     {
                         name: 'node:fs/promise.readFile',
                         fn: async () => {
-                            for await (const line of readFilePromise(targetFile)) {
-                                do_not_optimize(line);
-                            }
+                            do_not_optimize(await readFilePromise(targetFile));
                         }
                     },
                     {
@@ -47,8 +43,4 @@ LOC_RANGES.forEach((loc) => {
     });
 });
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-await runAndSave(path.join(process.cwd(), '.bench', `${__dirname}-report.json`), () => run({
-    throw: true,
-    format: 'json',
-}));
+await runWithConfig(run)

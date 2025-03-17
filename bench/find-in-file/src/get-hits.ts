@@ -1,4 +1,4 @@
-import type {LinePosition} from "../../../src/lib/types.ts";
+import type {LinePosition} from "../../../src/lib/shared/types.ts";
 
 export default function getLineHits(content: string, pattern: RegExp): LinePosition[] {
     const hits = [];

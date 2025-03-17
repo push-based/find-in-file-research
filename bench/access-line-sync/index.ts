@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import * as fs from "node:fs";
 import {bench, compact, do_not_optimize, group, run, summary} from 'mitata';
-import {fileName, runAndSave} from "../../src/lib/utils.ts";
+import {fileName, runWithConfig} from "../../src/lib/utils.ts";
 import {LOC_RANGES, VOLUME_TEST_DIR} from "../../src/lib/constants.ts";
 import stringSplit from "./src/node-String.split.ts";
 import stringIndexOf from "./src/node-String.indexOf.ts";
@@ -39,8 +39,4 @@ LOC_RANGES.forEach((loc) => {
     });
 });
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-await runAndSave(path.join(process.cwd(), '.bench', `${__dirname}-report.json`), () => run({
-    throw: true,
-    format: 'json',
-}));
+await runWithConfig(run)

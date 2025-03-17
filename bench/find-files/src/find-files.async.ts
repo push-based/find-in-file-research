@@ -22,9 +22,9 @@ export default async function findFiles(
         const tasks = entries.map(async (entry) => {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
-                queue.push(fullPath); // Push directory for future processing
+                queue.push(fullPath);
             } else if (entry.isFile() && fullPath.match(glob)) {
-                results.push(fullPath); // Store matched file
+                results.push(fullPath);
             }
         });
 

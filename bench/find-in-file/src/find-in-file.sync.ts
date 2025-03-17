@@ -1,34 +1,27 @@
-import type {SourceLocation} from "../../../src/lib/types.ts";
-import {readFileSync} from "node:fs";
-import getLineHits from "./get-hits.ts";
+import type {SourceLocation} from "../../../src/lib/shared/types.ts";
+import accessFile from "../../access-file/src/node-fs.readFileSync.ts";
+import accessContent from "../../access-line-sync/src/node-String.split.ts";
+import getLineHits from "../../pattern-matching/src/node-String.indexOf.ts";
 
-export default function findInFile(
+export default async function findInFile(
     file: string,
-    searchPattern: RegExp,
+    searchPattern: string,
     bail = false,
-): SourceLocation[] {
+): Promise<SourceLocation[]> {
     const hits: SourceLocation[] = [];
-    const content = readFileSync(file, 'utf8');
-    const lines = content.split('\n');
-
-    lines.forEach((line, index) => {
-        const startLine = index + 1;
-        getLineHits(line, searchPattern)
-            .forEach(({startColumn, endColumn}) => {
-                hits.push({
-                    file,
-                    position: {
-                        startLine,
-                        startColumn,
-                        endLine: startLine,
-                        endColumn,
-                    }
-                });
-                if (bail) {
-                    return hits;
+    const content = accessFile(file);
+    let startLine = 0;
+    for (const line of accessContent(content)) {
+        startLine++;
+        getLineHits(line, searchPattern, bail).forEach((position) => {
+            hits.push({
+                file,
+                position: {
+                    startLine,
+                    ...position,
                 }
             });
-    });
-
+        })
+    }
     return hits;
 }

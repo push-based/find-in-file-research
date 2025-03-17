@@ -20,6 +20,7 @@ export default function findFiles(
         }
 
         for (const entry of entries) {
+
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 queue.push(fullPath);

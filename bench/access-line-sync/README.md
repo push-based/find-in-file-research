@@ -1,187 +1,133 @@
-# Find Pattern in File - Benchmarks
+<!-- START HEADER -->
+# access-line-sync
+<!-- END HEADER -->
 
-This benchmark explores various techniques available in **Node.js** for efficiently finding patterns within a file.
+This benchmark explores various techniques available in **Node.js** accessing content line by line synchronously.
 
 ---
 
 ## Benchmark Requirements
 
-- **Search Content:** The search content should get returned as *string**
-    - **Line:** The content should be accessible line by line
+- **Search file content:** The  content should get returned as `string`
+    - **Iterate over lines:** The content should be accessible line by line
 
 ---
 
-## Overview
 
-| **File**          | **fs.readFileSync** | **fs/promises.readFile** | **readline** | **Fastest Speed Advantage**    |
-|-------------------|---------------------|--------------------------|--------------|--------------------------------|
-| `10-loc.txt`      | **6.23 µs**         | 512.18 µs                | 481.15 µs    | **77.28x faster** than closest |
-| `100-loc.txt`     | **8.08 µs**         | 45.42 µs                 | 459.36 µs    | **5.62x faster** than closest  |
-| `1000-loc.txt`    | **29.52 µs**        | 581.85 µs                | 781.66 µs    | **19.71x faster** than closest |
-| `10000-loc.txt`   | **564.30 µs**       | 1.22 ms                  | 2.92 ms      | **2.17x faster** than closest  |
-| `100000-loc.txt`  | 9.32 ms             | **8.20 ms**              | 14.28 ms     | **1.14x faster** than closest  |
-| `1000000-loc.txt` | **25.03 ms**        | 41.92 ms                 | 56.63 ms     | **1.68x faster** than closest  |
+<!-- START OVERVIEW -->
+The  node:String.split benchmark is the fastest.
 
----
 
-### How Much Faster?
+## content access sync; loc: 100;
 
-- **Small Files (10-1000 LOC):**
-    - `fs.readFileSync` is **5.6x to 77x faster**, showing that synchronous reading is extremely efficient for small
-      files.
+| alias                 | avg (min … max)                        | p75         | p99         | speed        |
+| --------------------- | -------------------------------------- | ----------- | ----------- | ------------ |
+| **node:String.split** | 4288.56 ns/iter (4216.87 … 4377.40)    | 4310.46 ns  | 4359.49 ns  | 🔥 fastest   |
+| node:String.indexOf   | 10249.29 ns/iter (10157.71 … 10405.22) | 10291.35 ns | 10359.85 ns | 2.39x slower |
 
-- **Medium Files (10,000 LOC):**
-    - The speed difference reduces, but `fs.readFileSync` remains **2.17x faster** than its async counterpart.
+## content access sync; loc: 1000;
 
-- **Large Files (100,000 LOC):**
-    - Surprisingly, `fs/promises.readFile` slightly outperforms `fs.readFileSync`, indicating that asynchronous
-      operations can start to optimize better for larger file sizes.
+| alias                 | avg (min … max)                          | p75          | p99          | speed        |
+| --------------------- | ---------------------------------------- | ------------ | ------------ | ------------ |
+| **node:String.split** | 39987.98 ns/iter (39604.38 … 40731.12)   | 40048.02 ns  | 40222.11 ns  | 🔥 fastest   |
+| node:String.indexOf   | 111274.73 ns/iter (99958.00 … 133500.00) | 111750.00 ns | 122250.00 ns | 2.78x slower |
 
-- **Massive Files (1,000,000 LOC):**
-    - `fs.readFileSync` regains performance advantage, being **1.68x faster** than the async variant, and **2.26x faster
-      ** than `readline`.
+## content access sync; loc: 10000;
 
----
+| alias                 | avg (min … max)                            | p75          | p99           | speed        |
+| --------------------- | ------------------------------------------ | ------------ | ------------- | ------------ |
+| **node:String.split** | 425338.32 ns/iter (390459.00 … 477375.00)  | 430959.00 ns | 464958.00 ns  | 🔥 fastest   |
+| node:String.indexOf   | 988666.87 ns/iter (926209.00 … 1090667.00) | 997041.00 ns | 1071625.00 ns | 2.32x slower |
 
-## File Content Access Methods
+## content access sync; loc: 100000;
 
---- 
+| alias                 | avg (min … max)                                 | p75            | p99            | speed        |
+| --------------------- | ----------------------------------------------- | -------------- | -------------- | ------------ |
+| **node:String.split** | 4159129.90 ns/iter (4019250.00 … 4374709.00)    | 4194250.00 ns  | 4331500.00 ns  | 🔥 fastest   |
+| node:String.indexOf   | 10250378.45 ns/iter (10087375.00 … 10556334.00) | 10326041.00 ns | 10528250.00 ns | 2.46x slower |
 
-Overview
-
-- `node:fs.readFileSync`
-- `node:fs.readFile`
-- `node:fs.createReadStream` with `node:readline.createInterface`
+<!-- END OVERVIEW -->
 
 ---
 
-### 1. Synchronous File Reading
-
-- **Method:** `fs.readFileSync`
-- **Description:** Reads the entire file synchronously into memory before processing.
-- **Source:** [node-fs.readFileSync.ts](./src/node-fs.readFileSync.ts)
-
-```javascript
-import * as fs from "node:fs";
-
-export default function accessContent(filePath: string): void {
-    const content = fs.readFileSync(filePath, "utf8");
-    content.split("\n")
-        .forEach(line => (line === 'not-in-file'));
-}
-```
-
-### 2. Asynchronous File Reading
-
-- **Method:** `fs.promises.readFile`
-- **Description:** Reads the entire file asynchronously into memory before processing.
-- **Source:** [node-fs.promise.readFile.ts](./src/node-fs.promise.readFile.ts)
-
-```javascript
-import * as fs from "node:fs/promises";
-
-export default async function accessContent(filePath): Promise<void> {
-    const content = await fs.readFile(filePath, "utf8");
-    content.split("\n")
-        .forEach(line => (line === 'not-in-file'));
-}
-```
-
-### 3. Streaming File Reading (Line by Line)
-
-- **Method:** `fs.createReadStream` with `readline.createInterface`
-- **Description:** Processes the file line by line without loading the entire file into memory.
-- **Source:** [node-readline](./src/node-readline.ts)
-
-```javascript
-import * as fs from "node:fs";
-import * as readline from "node:readline";
-
-export default async function accessContent(filePath: string): Promise<void> {
-    const stream = fs.createReadStream(filePath);
-    const rl = readline.createInterface({input: stream});
-    for await (const line of rl) {
-        line === 'not-in-file';
+<!-- START CASES -->
+## node-String.indexOf.ts
+_[node-String.indexOf.ts](access-line-sync/src)_
+```ts
+export default function* accessContent(content: string): Generator<string> {
+    let start = 0;
+    while (start < content.length) {
+        const index = content.indexOf('\n', start);
+        const line = index === -1 ? content.slice(start) : content.slice(start, index);
+        yield line;
+        if (index === -1) break;
+        start = index + 1;
     }
 }
+
 ```
+
+## node-String.split.ts
+_[node-String.split.ts](access-line-sync/src)_
+```ts
+export default function* accessContent(content: string): Generator<string> {
+    for (const line of content.split('\n')) {
+        yield line;
+    }
+}
+
+```
+
+<!-- END CASES -->
 
 --- 
 
 ## Benchmark Results
 
-```shell
-> npx tsx --tsconfig=../tsconfig.perf.json file-access
-
-clk: ~3.33 GHz
+<!-- START DATA -->
+```bash
+clk: ~3.53 GHz
 cpu: Apple M2 Max
-runtime: node 22.12.0 (arm64-darwin)
+runtime: node 23.9.0 (arm64-darwin)
 
 benchmark                   avg (min … max) p75 / p99    (min … top 1%)
 ------------------------------------------- -------------------------------
-• file access; loc: 10;
+• content access sync; loc: 100;
 ------------------------------------------- -------------------------------
-node:fs.readFileSync           6.23 µs/iter   6.26 µs   6.83 µs ▂█▆▃▂▁▁▁▁▁▁
-node:fs/promise.readFile     512.18 µs/iter 661.42 µs   1.36 ms ▂█▄▂▃▂▁▁▁▁▁
-node:readline                481.15 µs/iter 533.42 µs 978.21 µs ▁▁▂█▅▂▂▂▂▁▁
+node:String.split              4.36 µs/iter   4.38 µs   4.46 µs ▂▃██▃▃▃▃▂▁▁
+node:String.indexOf           10.54 µs/iter  10.70 µs  10.79 µs ▅▄█▅▂▂▁▄▇▅▄
 
 summary
-  node:fs.readFileSync
-   77.28x faster than node:readline
-   82.26x faster than node:fs/promise.readFile
+  node:String.split
+   2.42x faster than node:String.indexOf
 
-• file access; loc: 100;
+• content access sync; loc: 1000;
 ------------------------------------------- -------------------------------
-node:fs.readFileSync           8.08 µs/iter   8.09 µs   8.38 µs ▃▅▇█▅▃▁▁▃▃▂
-node:fs/promise.readFile      45.42 µs/iter  45.30 µs  46.21 µs ▅▃█▅▁▁▁▁▃▁▃
-node:readline                459.36 µs/iter 515.54 µs 931.92 µs ▁▁▂█▅▂▂▂▂▁▁
+node:String.split             41.46 µs/iter  41.65 µs  42.03 µs ▃▁▁▁▆█▃▆▃▁▃
+node:String.indexOf          113.01 µs/iter 114.04 µs 128.67 µs ▁▂▆█▅▂▂▁▁▁▁
 
 summary
-  node:fs.readFileSync
-   5.62x faster than node:fs/promise.readFile
-   56.83x faster than node:readline
+  node:String.split
+   2.73x faster than node:String.indexOf
 
-• file access; loc: 1000;
+• content access sync; loc: 10000;
 ------------------------------------------- -------------------------------
-node:fs.readFileSync          29.52 µs/iter  29.07 µs  29.82 µs ▂▂█▁▄▂▁▁▁▁▂
-node:fs/promise.readFile     581.85 µs/iter 720.67 µs   1.35 ms ▁▇█▂▂▃▂▂▁▁▁
-node:readline                781.66 µs/iter 837.54 µs   1.36 ms ▁▁▁▄█▃▂▂▂▂▁
+node:String.split            446.30 µs/iter 456.88 µs 491.04 µs ▁▁▃▅█▆▅▄▂▁▁
+node:String.indexOf            1.04 ms/iter   1.07 ms   1.15 ms ▁▁▅█▅▄▃▃▂▂▁
 
 summary
-  node:fs.readFileSync
-   19.71x faster than node:fs/promise.readFile
-   26.48x faster than node:readline
+  node:String.split
+   2.34x faster than node:String.indexOf
 
-• file access; loc: 10000;
+• content access sync; loc: 100000;
 ------------------------------------------- -------------------------------
-node:fs.readFileSync         564.30 µs/iter 568.13 µs   1.44 ms ▂▁█▃▁▁▁▁▁▁▁
-node:fs/promise.readFile       1.22 ms/iter   1.38 ms   1.74 ms ▁▅█▇▆▆▇▄▃▂▁
-node:readline                  2.92 ms/iter   3.00 ms   3.23 ms ▁▃▅▄▆█▇▅▃▂▁
+node:String.split              4.38 ms/iter   4.47 ms   4.73 ms ▂▃▅██▇▅▄▃▂▁
+node:String.indexOf           10.47 ms/iter  10.55 ms  10.85 ms ▃█▆▄▄▄▃▂▁▂▂
 
 summary
-  node:fs.readFileSync
-   2.17x faster than node:fs/promise.readFile
-   5.17x faster than node:readline
+  node:String.split
+   2.39x faster than node:String.indexOf
 
-• file access; loc: 100000;
-------------------------------------------- -------------------------------
-node:fs.readFileSync           9.32 ms/iter   9.65 ms   9.97 ms ▁▁▁▁▁▁▁▂▄█▂
-node:fs/promise.readFile       8.20 ms/iter   8.78 ms   9.28 ms ▃▄▂▂▃▃▄▆█▄▁
-node:readline                 14.28 ms/iter  14.46 ms  15.08 ms ▂▆█▆▅▃▄▂▂▂▂
-
-summary
-  node:fs/promise.readFile
-   1.14x faster than node:fs.readFileSync
-   1.74x faster than node:readline
-
-• file access; loc: 1000000;
-------------------------------------------- -------------------------------
-node:fs.readFileSync          25.03 ms/iter  24.87 ms  34.75 ms ▂█▂▁▁▁▁▁▁▁▁
-node:fs/promise.readFile      41.92 ms/iter  45.11 ms  46.60 ms ▅▄▁▁▁▃▃▄█▇▃
-node:readline                 56.63 ms/iter  56.98 ms  57.20 ms ▃▁▃▃▆▆▅▆▃█▃
-
-summary
-  node:fs.readFileSync
-   1.68x faster than node:fs/promise.readFile
-   2.26x faster than node:readline
 ```
+
+<!-- END DATA -->
