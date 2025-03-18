@@ -27,11 +27,13 @@ export default async function findInFiles(
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 queue.push(fullPath);
-            } else if (entry.isFile()
-            //    && fullPath.match(glob)
+            } else if (entry.isFile() && fullPath.match(glob)
             ) {
                 for (const result of await findInFile(fullPath, pattern, bail)) {
                     results.push(result);
+                    if (bail) {
+                        return results;
+                    }
                 }
             }
         }

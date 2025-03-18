@@ -1,0 +1,20 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "moduleResolution": "node",
+    "importHelpers": false,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "target": "es2022",
+    "module": "commonjs",
+    "lib": [
+      "es2023"
+    ],
+    "baseUrl": "."
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

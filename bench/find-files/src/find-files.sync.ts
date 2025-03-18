@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export default function findFiles(
+    glob: RegExp,
     baseDir: string,
-    glob: RegExp
 ): string[] {
     const queue: string[] = [baseDir];
     const results: string[] = [];

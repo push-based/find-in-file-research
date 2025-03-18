@@ -4,13 +4,8 @@ import * as path from "node:path";
 import {ensureDirectoryExists, removeDirectoryIfExists} from "./file-system.ts";
 import {LOC_RANGES, README_TEMPLATE} from "./constants.ts";
 import type {ctx, trial} from "mitata";
-
-import {promisify} from 'util';
-
 import {exec as execCb, spawn} from 'child_process';
 import type {BenchmarkData} from "./benchmarks.ts";
-
-const exec = promisify(execCb);
 
 const CONCURRENCY_LIMIT = 5;
 
@@ -67,19 +62,23 @@ const writeToFileStream = async (filePath: string, totalLines = 400, lineLength 
     await new Promise((resolve) => stream.on('finish', resolve));
 };
 
-export async function generateTestFiles(baseDir: string, {
-    levels = 1,
-    subDirs = 1,
-    filesPerDir = 1,
-    totalLines = 100,
-    lineLength = 80
-}: {
+export type TestFileConfig = {
     levels?: number;
     subDirs?: number;
     filesPerDir?: number;
     totalLines?: number;
     lineLength?: number;
-} = {}): Promise<void> {
+    ext?: string;
+}
+
+export async function generateTestFiles(baseDir: string, {
+    levels = 1,
+    subDirs = 1,
+    filesPerDir = 1,
+    totalLines = 1000,
+    lineLength = 300,
+    ext = 'txt'
+}: TestFileConfig = {}): Promise<void> {
 
     const processDirsSequentially = async (dir: string, level: number): Promise<void> => {
         if (level > levels) return;
@@ -89,7 +88,7 @@ export async function generateTestFiles(baseDir: string, {
             await fs.mkdir(subDirPath, {recursive: true});
 
             for (let j = 0; j < filesPerDir; j++) {
-                const filePath = path.join(subDirPath, `file_${j + 1}.txt`);
+                const filePath = path.join(subDirPath, `file_${j + 1}.${ext}`);
                 await writeToFileStream(filePath, totalLines, lineLength);
             }
 
@@ -170,7 +169,7 @@ export async function writeBenchmarksToFile(bench: string, opt?: {
             if (code !== 0) {
                 reject(new Error(`Benchmark process exited with code ${code}`));
             } else {
-                console.log(`Benchmarks successfully written to ${filePath}`);
+                console.log(`✅ Benchmarks successfully written to ${filePath}`);
                 resolve();
             }
         });
@@ -242,3 +241,22 @@ export function gatherBenchData(benchmarkFolders: string[]): BenchmarkData[] {
 
 }
 
+
+export function getTestFileConfig(opt: TestFileConfig) {
+    const options = {
+        levels: 0,
+        subDirs: 0,
+        filesPerDir: 100,
+        totalLines: 1000,
+        lineLength: 400,
+        ...opt,
+    }
+    return {
+        dir: folderNameFromTestFileConfig(options),
+        opt: options
+    }
+}
+
+export function folderNameFromTestFileConfig(opt: TestFileConfig): string {
+    return `dir-${opt.subDirs}-file-${opt.filesPerDir}-nest-${opt.levels}-loc-${opt.totalLines}-l-${opt.lineLength}`;
+}

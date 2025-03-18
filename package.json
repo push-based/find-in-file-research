@@ -13,7 +13,7 @@
     "bench:find-in-file": "node --expose-gc --experimental-strip-types ./bench/find-in-file/index.ts",
     "bench:find-in-file-bail": "node --expose-gc --experimental-strip-types ./bench/find-in-file-bail/index.ts",
     "bench:find-in-files": "node --expose-gc --experimental-strip-types ./bench/find-in-files/index.ts",
-    "setup": "npx tsx ./src/setup-fixtures.bin.ts",
+    "setup": "node --experimental-strip-types ./src/setup-fixtures.bin.ts",
     "generate": "npx tsx ./src/create-benchmark.bin.ts"
   },
   "engines": {
@@ -26,6 +26,9 @@
     "tsx": "^4.19.0"
   },
   "dependencies": {
-    "fast-find-in-files": "^1.0.5"
+    "fast-find-in-files": "^1.0.5",
+    "fast-glob": "^3.3.3",
+    "glob": "^11.0.1",
+    "globby": "^14.1.0"
   }
 }

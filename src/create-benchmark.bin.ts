@@ -12,20 +12,20 @@ console.log(res.at(1));
 throw new Error('stop');
 */
 
-const dir = fs.readdirSync(path.join(process.cwd(), 'bench'))
-    .filter((f) => fs.statSync(path.join(process.cwd(), 'bench', f)).isDirectory());
-const benchmarkFolders = ['find-files'];
+const dirs = fs.readdirSync(path.join(process.cwd(), 'bench')).filter((f) => fs.statSync(path.join(process.cwd(), 'bench', f)).isDirectory());
+console.log(`✔️ Found ${dirs.length} benchmark folders`);
 
-for (const folder of benchmarkFolders) {
+for (const folder of ['find-in-files']) {
     const benchFile = path.join(process.cwd(), 'bench', folder, 'index.ts');
     await writeBenchmarksToFile(benchFile, {format: 'json'});
     await writeBenchmarksToFile(benchFile);
 }
 
-gatherBenchData(benchmarkFolders).map((b) => {
+
+gatherBenchData(dirs).map((b) => {
     const readmePath = path.join(process.cwd(), 'bench', b.folder, 'README.md');
     fs.writeFileSync(readmePath, updateReadme(b.readme, b));
-    console.log(`Wrote readme for ${readmePath}`);
+    console.log(`✅️ Wrote readme for ${readmePath}`);
 });
 
 

@@ -14,25 +14,25 @@ LOC_RANGES.forEach((loc) => {
     const targetFile = fileName(fixtureDir, loc);
 
     summary(() => {
-        //   compact(() => {
+        // compact(() => {
         group(`find in file; loc: ${loc}; regex: ${regex}`, () => {
             bench('sync', async () => {
                 if ((await findInFileSync(targetFile, regex)).length === 0) {
-                    throw new Error('No hits found. Bench invalid.')
+                    throw new Error('No hits found. Bench invalid.');
                 }
             }).gc('inner');
             bench('async', async () => {
                 if ((await findInFileAsync(targetFile, regex)).length === 0) {
-                    throw new Error('No hits found. Bench invalid.')
+                    throw new Error('No hits found. Bench invalid.');
                 }
             }).gc('inner');
             bench('stream', async () => {
                 if ((await findInFileStream(targetFile, regex)).length === 0) {
-                    throw new Error('No hits found. Bench invalid.')
+                    throw new Error('No hits found. Bench invalid.');
                 }
             }).gc('inner');
         })
-        //    })
+        // })
     })
 
 });

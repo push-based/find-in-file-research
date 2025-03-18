@@ -31,7 +31,6 @@ export default async function findInFilesAsync(
                 for (const result of await findInFile(fullPath, pattern, bail)) {
                     results.push(result);
                 }
-
             }
         });
 

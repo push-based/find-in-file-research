@@ -1,7 +1,5 @@
 import {mkdir, rm, stat} from 'node:fs/promises';
 import {execSync} from 'node:child_process';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export async function directoryExists(filePath: string): Promise<boolean> {
     try {

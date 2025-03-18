@@ -2,8 +2,8 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 export default async function findFiles(
+    glob: RegExp,
     baseDir: string,
-    glob: RegExp
 ): Promise<string[]> {
     const results: string[] = [];
     const queue: string[] = [baseDir];
